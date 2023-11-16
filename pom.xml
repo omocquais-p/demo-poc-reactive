@@ -19,10 +19,6 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
         <dependency>
@@ -39,8 +35,33 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
-    </dependencies>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Test Containers-->
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.18.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.18.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.redis.testcontainers</groupId>
+            <artifactId>testcontainers-redis-junit</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
