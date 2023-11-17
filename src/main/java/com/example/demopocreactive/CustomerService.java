@@ -19,4 +19,10 @@ public class CustomerService {
                 .save(new Customer(UUID.randomUUID().toString(), customerDTO.firstName(), customerDTO.name()))
                 .map(customer -> new CustomerResponseDTO(UUID.fromString(customer.uuid()), customer.name(), customer.firstName()));
     }
+
+    public Mono<CustomerResponseDTO> get(String uuid) {
+        return customerRepository
+                .findById(uuid)
+                .map(customer -> new CustomerResponseDTO(UUID.fromString(customer.uuid()), customer.name(), customer.firstName()));
+    }
 }

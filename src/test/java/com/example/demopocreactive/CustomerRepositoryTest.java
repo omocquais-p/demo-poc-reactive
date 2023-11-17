@@ -23,7 +23,7 @@ class CustomerRepositoryTest {
 
     @DisplayName("Given a customer, It should be persisted in Redis")
     @Test
-    public void shouldRetrieveFromCache() {
+    public void shouldPersistACustomerIntoCache() {
         Customer customer = new Customer(UUID.randomUUID().toString(), "John", "Smith");
 
         StepVerifier.create(customerRepository.save(customer))
@@ -35,6 +35,21 @@ class CustomerRepositoryTest {
                         (customer1.firstName().equals(customer.firstName()))
                         && (customer1.name().equals(customer.name()))
                         && (customer1.uuid().equals(customer.uuid()))
+                ).verifyComplete();
+    }
+
+    @DisplayName("Given a customer persisted in Redis, It should be retrieved from Redis")
+    @Test
+    public void shouldRetrieveACustomerIntoCache() {
+        Customer customer = new Customer(UUID.randomUUID().toString(), "John", "Smith");
+
+        reactiveRedisOperations.opsForValue().set(customer.uuid(), customer).subscribe();
+
+        StepVerifier.create(customerRepository.findById(customer.uuid()))
+                .expectNextMatches(customer1 ->
+                        (customer1.firstName().equals(customer.firstName()))
+                                && (customer1.name().equals(customer.name()))
+                                && (customer1.uuid().equals(customer.uuid()))
                 ).verifyComplete();
     }
 }

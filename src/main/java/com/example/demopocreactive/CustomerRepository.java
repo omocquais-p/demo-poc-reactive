@@ -20,4 +20,9 @@ public class CustomerRepository {
                 .map(__ -> customer);
     }
 
+    public Mono<Customer> findById(String uuid) {
+        return reactiveRedisOperations
+                .opsForValue()
+                .get(uuid);
+    }
 }
