@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-class CustomerRepository {
+public class CustomerRepository {
 
     private final ReactiveRedisOperations<String, Customer> reactiveRedisOperations;
 
@@ -14,7 +14,8 @@ class CustomerRepository {
     }
 
     public Mono<Customer> save(Customer customer) {
-        return reactiveRedisOperations.opsForValue()
+        return reactiveRedisOperations
+                .opsForValue()
                 .set(customer.uuid(), customer)
                 .map(__ -> customer);
     }

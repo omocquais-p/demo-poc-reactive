@@ -8,7 +8,15 @@ import java.util.UUID;
 @Service
 public class CustomerService {
 
+    private final CustomerRepository customerRepository;
+
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
     public Mono<CustomerResponseDTO> create(CustomerDTO customerDTO) {
-        return Mono.just(new CustomerResponseDTO(UUID.randomUUID(), customerDTO.name(), customerDTO.firstName()));
+        return customerRepository
+                .save(new Customer(UUID.randomUUID().toString(), customerDTO.firstName(), customerDTO.name()))
+                .map(customer -> new CustomerResponseDTO(UUID.fromString(customer.uuid()), customer.name(), customer.firstName()));
     }
 }
