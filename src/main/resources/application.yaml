@@ -1,3 +1,41 @@
 spring:
   application:
     name: demo-spring-boot-reactive
+  main:
+    web-application-type: reactive
+  data:
+    jdbc:
+      repositories:
+        enabled: false
+    redis:
+      repositories:
+        enabled: true
+management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: [ "health", "info", "env" ]
+  endpoint:
+    env:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+    info:
+      enabled: true
+  tracing:
+    enabled: false
+    sampling:
+      probability: 1.0
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

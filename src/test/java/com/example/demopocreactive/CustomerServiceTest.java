@@ -1,13 +1,14 @@
 package com.example.demopocreactive;
 
+import io.micrometer.observation.tck.TestObservationRegistry;
+import io.micrometer.observation.tck.TestObservationRegistryAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -20,11 +21,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
-
-    @InjectMocks
-    private CustomerService customerService;
 
     @Mock
     private CustomerRepository customerRepository;
@@ -41,6 +39,10 @@ class CustomerServiceTest {
         CustomerDTO customerDTO = new CustomerDTO("Smith", "John");
         when(customerRepository.save(any(Customer.class))).thenReturn(Mono.just(new Customer(UUID.randomUUID().toString(), customerDTO.firstName(), customerDTO.name())));
 
+        TestObservationRegistry registry = TestObservationRegistry.create();
+
+        CustomerService customerService = new CustomerService(customerRepository,registry);
+
         Mono<CustomerResponseDTO> customerMono = customerService.create(customerDTO);
         StepVerifier
                 .create(customerMono)
@@ -54,6 +56,15 @@ class CustomerServiceTest {
         Customer customerCaptorValue = customerCaptor.getValue();
         assertThat(customerCaptorValue.name()).isEqualTo(customerDTO.name());
         assertThat(customerCaptorValue.firstName()).isEqualTo(customerDTO.firstName());
+
+        TestObservationRegistryAssert.assertThat(registry)
+                .doesNotHaveAnyRemainingCurrentObservation()
+                .hasObservationWithNameEqualTo("create.customer")
+                .that()
+                .hasLowCardinalityKeyValue("customer.name.length", "short")
+                .hasBeenStarted()
+                .hasBeenStopped();
+
     }
 
     @Test
@@ -67,10 +78,12 @@ class CustomerServiceTest {
         when(customerRepository.findById(eq(uuid)))
                 .thenReturn(Mono.just(new Customer(uuid, customer.firstName(), customer.name())));
 
-        Mono<CustomerResponseDTO> customerMono = customerService.get(customer.uuid());
+        TestObservationRegistry registry = TestObservationRegistry.create();
+
+        CustomerService customerService = new CustomerService(customerRepository,registry);
 
         StepVerifier
-                .create(customerMono)
+                .create(customerService.get(customer.uuid()))
                 .consumeNextWith(customerFound -> {
                     assertEquals(customerFound.uuid().toString(), customer.uuid());
                     assertEquals(customerFound.firstName(), customer.firstName());
@@ -81,5 +94,13 @@ class CustomerServiceTest {
         verify(customerRepository).findById(uuidCaptor.capture());
         String uuidCaptorValue = uuidCaptor.getValue();
         assertThat(uuidCaptorValue).isEqualTo(uuid);
+
+        TestObservationRegistryAssert.assertThat(registry)
+                .doesNotHaveAnyRemainingCurrentObservation()
+                .hasObservationWithNameEqualTo("get.customer")
+                .that()
+                .hasLowCardinalityKeyValue("uuid", uuid)
+                .hasBeenStarted()
+                .hasBeenStopped();
     }
 }
