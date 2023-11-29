@@ -12,10 +12,8 @@ make start-app
 
 - Call the application to create customers in Redis
 ```
-make start-app
+make customers-local
 ```
 
 ## Metrics in Prometheus / Grafana
-
-- create_customer_milliseconds_count
-- get_customer_milliseconds_sum
+- Check Metrics ( _create_customer_milliseconds_count_ and _get_customer_milliseconds_sum_ in Prometheus: http://localhost:9090/ (Metrics Explorer) and in Grafana (http://localhost:3000/)
