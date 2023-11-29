@@ -15,3 +15,17 @@ build-image:
 
 call-api:
 	./helpers/create-customers.sh
+
+# Local - call the actuator endpoint
+actuator-local:
+	{ \
+	set -e ;\
+	./scripts/check-actuator-endpoint.sh http://localhost:8080 ;\
+	}
+
+# Local - call the API to create customers
+customers-local:
+	{ \
+	set -e ;\
+	./scripts/populate-customers.sh  http://localhost:8080 ;\
+	}
