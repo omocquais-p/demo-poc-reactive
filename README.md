@@ -14,3 +14,8 @@ make start-app
 ```
 make start-app
 ```
+
+## Metrics in Prometheus / Grafana
+
+- create_customer_milliseconds_count
+- get_customer_milliseconds_sum
